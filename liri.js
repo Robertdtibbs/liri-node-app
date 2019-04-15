@@ -4,8 +4,13 @@ var keys = require("./keys.js");
 var Spotify = require('node-spotify-api');
 var spotify = new Spotify(keys.spotify);
 //all other api calls
-var axios = require("axios")
+var axios = require("axios");
+// moment require
+var moment = require("moment");
+var fs = require("fs");
 
+
+// User entry variables
 var selection = process.argv[2];
 var input = process.argv.slice(3);
 var type = input.join(' ')
@@ -20,10 +25,15 @@ switch (selection){
                 // console.log(response.data);
                 console.log(response.data[0].venue.name);
                 console.log(response.data[0].venue.city + ", " + response.data[0].venue.region);
-                console.log(response.data[0].datetime);
+                var concertDate = moment(response.data[0].datetime).format("MM/DD/YYYY hh:00 A")
+                console.log(concertDate);
             })
         break;
     case "spotify-this-song":
+        if(!type){
+            type = "The Sign";
+        }
+
         spotify.search({
             type: "track",
             query: type
@@ -39,15 +49,12 @@ switch (selection){
                 console.log(data.tracks.items[0].external_urls.spotify)
             }
         })
-        // * Artist(s)
-
-        // * The song's name
-   
-        // * A preview link of the song from Spotify
-   
-        // * The album that the song is from
         break;
     case "movie-this":
+        if(!type){
+            type = "Mr Nobody";
+        }
+        
         var movie = "http://www.omdbapi.com/?apikey=trilogy&t=" + type;
         console.log(movie)
         axios.get(movie).then(function(response){
@@ -63,6 +70,13 @@ switch (selection){
         break;
     case "do-what-it-says":
         console.log("Do what it do!")
+        fs.readFile("random.txt", "UTF8", function(err, data){
+            if(err){
+                console.log(err)
+            }else{
+                console.log(data)
+            }
+        })
         break;
     default:
         console.log("Not the right question")
